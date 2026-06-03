@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>课堂时间操控器</title>
+
+<style>
+body{
+    margin:0;
+    height:100vh;
+    overflow:hidden;
+    font-family:"PingFang SC";
+    background: radial-gradient(circle at top,#0b1020,#02040a);
+    color:#00f5ff;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}
+
+.glow{
+    position:absolute;
+    width:400px;height:400px;
+    background:#00f5ff;
+    filter:blur(140px);
+    opacity:0.15;
+}
+
+.panel{
+    width:90%;
+    max-width:380px;
+    padding:20px;
+    border-radius:20px;
+    background:rgba(255,255,255,0.05);
+    border:1px solid rgba(0,245,255,0.3);
+    text-align:center;
+    backdrop-filter: blur(10px);
+}
+
+h1{
+    font-size:18px;
+    letter-spacing:2px;
+}
+
+#energy{
+    font-size:42px;
+    margin:10px 0;
+    text-shadow:0 0 10px #00f5ff;
+}
+
+.bar{
+    height:10px;
+    background:rgba(255,255,255,0.1);
+    border-radius:10px;
+    overflow:hidden;
+    margin:10px 0;
+}
+
+.fill{
+    height:100%;
+    width:0%;
+    background:linear-gradient(90deg,#00f5ff,#7c3aed);
+    transition:0.2s;
+}
+
+button{
+    width:100%;
+    padding:14px;
+    margin-top:10px;
+    border:none;
+    border-radius:12px;
+    font-weight:bold;
+    cursor:pointer;
+    background:linear-gradient(90deg,#00f5ff,#7c3aed);
+    color:black;
+}
+
+button:active{
+    transform:scale(0.97);
+}
+
+.small{
+    font-size:12px;
+    opacity:0.8;
+    margin-top:8px;
+}
+
+.float{
+    position:absolute;
+    font-size:14px;
+    animation:rise 1s ease-out forwards;
+}
+
+@keyframes rise{
+    from{transform:translateY(0);opacity:1;}
+    to{transform:translateY(-80px);opacity:0;}
+}
+
+.flash{
+    animation:flash 0.2s;
+}
+
+@keyframes flash{
+    0%{filter:brightness(1);}
+    50%{filter:brightness(2);}
+    100%{filter:brightness(1);}
+}
+</style>
+</head>
+
+<body>
+
+<div class="glow"></div>
+
+<div class="panel">
+    <h1>🧠 课堂时间操控系统</h1>
+
+    <div id="energy">0</div>
+
+    <div class="bar">
+        <div class="fill" id="fill"></div>
+    </div>
+
+    <button onclick="clickCore()">⚡ 点击加速时间</button>
+    <button onclick="overclock()">🚀 强制超频（消耗能量）</button>
+
+    <div class="small" id="msg">系统初始化完成</div>
+</div>
+
+<script>
+let energy = 0;
+let speed = 1;
+let critChance = 0.1;
+
+function clickCore(){
+
+    let isCrit = Math.random() < critChance;
+
+    let gain = isCrit ? 5 : 1;
+
+    energy += gain;
+
+    // 暴击提升机制
+    if(isCrit){
+        speed += 0.3;
+        critChance = Math.min(0.35, critChance + 0.01);
+    }
+
+    updateUI();
+
+    // 浮动效果
+    const f = document.createElement("div");
+    f.className="float";
+    f.innerText = isCrit ? "💥 暴击+"+gain : "+1";
+    f.style.left = (50 + Math.random()*80 - 40)+"%";
+    f.style.top="60%";
+    document.body.appendChild(f);
+
+    setTimeout(()=>f.remove(),1000);
+
+    document.body.classList.add("flash");
+    setTimeout(()=>document.body.classList.remove("flash"),150);
+
+    // 文案
+    if(energy > 20) setMsg("时间流速开始不稳定");
+    if(energy > 50) setMsg("⚠ 教室时间结构正在松动");
+    if(energy > 80) setMsg("🚨 快下课概率上升（心理模型）");
+    if(energy > 120) setMsg("✨ 接近课堂崩塌边界");
+}
+
+function overclock(){
+    if(energy < 20){
+        setMsg("能量不足，无法超频");
+        return;
+    }
+
+    energy -= 20;
+    speed += 1.5;
+
+    critChance += 0.05;
+
+    document.body.style.filter="hue-rotate(120deg) contrast(1.3)";
+
+    setMsg("🚀 已进入超频模式：时间被压缩");
+    updateUI();
+}
+
+function updateUI(){
+    document.getElementById("energy").innerText = Math.floor(energy);
+
+    let percent = Math.min(100, energy);
+    document.getElementById("fill").style.width = percent + "%";
+}
+
+function setMsg(t){
+    document.getElementById("msg").innerText = t;
+}
+</script>
+
+</body>
+</html>
